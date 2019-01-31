@@ -89,12 +89,12 @@ pass different options while declaring a DI service (see below).
 
 ```javascript
 const awilix = require('awilix');
-const {awilixService} = require('@elunic/logger');
+const {awilixLogService} = require('@elunic/logger');
 
 const container = awilix.createContainer();
 
 container.register({
-  log: awilix.asFunction(awilixService('app', {
+  log: awilix.asFunction(awilixLogService('app', {
     consoleLevel: process.env.LOG_LEVEL || 'info',
     logPath: process.cwd() + '/logs',
   })),
@@ -106,11 +106,11 @@ container.register({
 
 ```javascript
 const Bottle = require('bottlejs');
-const {bottlejsService} = require('@elunic/logger');
+const {bottlejsLogService} = require('@elunic/logger');
 
 const bottle = new Bottle();
 
-bottle.factory('log', bottlejsService('app', {
+bottle.factory('log', bottlejsLogService('app', {
   consoleLevel: process.env.LOG_LEVEL || 'info',
   logPath: process.cwd() + '/logs',
 }));
@@ -137,7 +137,7 @@ check whether spies have been called.
 
 ```typescript
 import * as Bottle from 'bottlejs';
-import { mockBottlejsService, MockLogService } from '@elunic/logger';
+import { mockBottlejsLogService, MockLogService } from '@elunic/logger';
 
 describe('my application test', () => {
   let testBottle: Bottle;
@@ -147,7 +147,7 @@ describe('my application test', () => {
     testBottle = new Bottle();
     
     // Mock log service
-    testBottle.factory('log', mockBottlejsService('apptest', 'silent'));
+    testBottle.factory('log', mockBottlejsLogService('apptest', 'silent'));
     
     logService = testBottle.container.log;    
   });

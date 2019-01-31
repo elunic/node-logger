@@ -2,7 +2,7 @@ import { LogLevels } from '../types';
 
 import { MockLogService } from './service';
 
-export function mockBottlejsService(
+export function mockBottlejsLogService(
   rootNamespace: string,
   debugLevel: LogLevels | 'silent' = 'silent',
 ) {

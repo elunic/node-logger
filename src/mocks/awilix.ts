@@ -2,7 +2,7 @@ import { LogLevels } from '../types';
 
 import { MockLogService } from './service';
 
-export function mockAwilixService(
+export function mockAwilixLogService(
   rootNamespace: string,
   debugLevel: LogLevels | 'silent' = 'silent',
 ) {

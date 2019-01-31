@@ -9,8 +9,8 @@ import { CreateLoggerOptions, CustomWinstonLogger, LogLevels } from './types';
 
 export { CreateLoggerOptions, Logger, RootLogger, LogLevels };
 export { LogService } from './service';
-export { awilixService } from './awilix';
-export { bottlejsService } from './bottlejs';
+export { awilixLogService } from './awilix';
+export { bottlejsLogService } from './bottlejs';
 
 export * from './mocks';
 
