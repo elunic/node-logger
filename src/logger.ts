@@ -14,7 +14,7 @@ export class Logger {
   }
 
   constructor(
-    private namespace: string,
+    public namespace: string,
     private rootLogger: CustomWinstonLogger,
     private childLogger?: CustomWinstonLogger,
   ) {

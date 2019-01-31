@@ -2,6 +2,15 @@ import * as winston from 'winston';
 
 import { Logger } from './logger';
 
+export enum LogLevels {
+  Trace = 'trace',
+  Debug = 'debug',
+  Info = 'info',
+  Warn = 'warn',
+  Error = 'error',
+  Fatal = 'fatal',
+}
+
 export interface CustomWinstonLogger extends winston.Logger {
   trace: (...msgs: Array<unknown>) => CustomWinstonLogger;
   debug: (...msgs: Array<unknown>) => CustomWinstonLogger;
@@ -12,7 +21,7 @@ export interface CustomWinstonLogger extends winston.Logger {
 }
 
 export interface CreateLoggerOptions {
-  consoleLevel: string;
+  consoleLevel: LogLevels;
   logPath?: string;
 }
 

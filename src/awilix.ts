@@ -1,4 +1,4 @@
-import { createLogger, CreateLoggerOptions, LogService } from './index';
+import { CreateLoggerOptions, LogService } from './index';
 
 export function awilixService(rootNamespace: string, options?: CreateLoggerOptions) {
   return function awilixServiceFactory() {

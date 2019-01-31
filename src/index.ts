@@ -5,12 +5,14 @@ import * as DailyRotateFile from 'winston-daily-rotate-file';
 import { levels } from './levels';
 import { Logger, RootLogger } from './logger';
 import { printf } from './printf';
-import { CreateLoggerOptions, CustomWinstonLogger } from './types';
+import { CreateLoggerOptions, CustomWinstonLogger, LogLevels } from './types';
 
-export { CreateLoggerOptions, Logger, RootLogger };
+export { CreateLoggerOptions, Logger, RootLogger, LogLevels };
 export { LogService } from './service';
 export { awilixService } from './awilix';
 export { bottlejsService } from './bottlejs';
+
+export * from './mocks';
 
 function validateNamespace(namespace: string) {
   if (!namespace) {
@@ -39,7 +41,7 @@ function createLogger(rootNamespace: string, rawOptions?: CreateLoggerOptions): 
   const options = Object.assign(
     {},
     {
-      consoleLevel: 'info',
+      consoleLevel: LogLevels.Info,
       logPath: undefined,
     },
     rawOptions || {},

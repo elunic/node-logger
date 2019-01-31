@@ -7,8 +7,8 @@ import { CreateChildLoggerFunction, CreateLoggerOptions } from './types';
 export class LogService {
   private logger: RootLogger;
 
-  constructor(private rootNamespace: string, options?: CreateLoggerOptions) {
-    this.logger = createLogger(rootNamespace, options);
+  constructor(public namespace: string, options?: CreateLoggerOptions) {
+    this.logger = createLogger(namespace, options);
   }
 
   createLogger(childNamespace: string): Logger {
