@@ -19,7 +19,8 @@ jobs:
       node_js: "10"
       script: echo "Deploying to npm"
       before_deploy:
-        - npm run compile
+        - npm run clean
+        - npm run compile:prod
       deploy:
         provider: npm
         email: "$NPM_EMAIL"

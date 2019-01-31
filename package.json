@@ -1,6 +1,6 @@
 {
   "name": "@elunic/logger",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "description": "A simple wrapper around winston which logs to console as well as multiple files, with child namespaces.",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,11 +9,12 @@
   ],
   "license": "MIT",
   "scripts": {
-    "test": "npm run compile && npx jasmine 'dist/test/**/*.spec.js'",
+    "test": "npm run clean && npm run compile && npx jasmine 'dist/test/**/*.spec.js'",
     "test:watch": "npm run clean && npx tsc-watch --onSuccess \"npx jasmine 'dist/test/**/*.spec.js'\" --preserveWatchOutput -w --noEmitOnError false",
     "check": "tslint -p . && npx prettier --config ./.prettierrc --check 'src/**/*.ts' 'test/**/*.ts'",
     "clean": "gts clean",
     "compile": "npm run clean && tsc -p .",
+    "compile:prod": "npm run clean && tsc -p tsconfig.prod.json",
     "fix": "npx tslint -p . --fix && npx prettier --config ./.prettierrc --write 'src/**/*.ts' 'test/**/*.ts'",
     "precommit": "lint-staged"
   },
