@@ -116,5 +116,50 @@ bottle.factory('log', bottlejsService('app', {
 ```
 
 
+## Mock usage
 
+Mocks for the service are included, both for `awilix` 
+and `bottlejs` registration. These are to help you when writing
+tests so they do not crash. They are silent be default (see below).
 
+Note that the arguments are slightly different than for the 
+real service. No `logPath` is required, only `namespace` and `debugLevel`.
+
+`debugLevel` is set to silent by default to prevent flooding of your test
+output. Setting this to an actual log level is mainly to help with
+debugging.
+
+The service can be accessed to retrieve single logger instances and
+check whether spies have been called.
+
+(the example is for `bottlejs`, but works in an analogeous way for `awilix`)
+
+```typescript
+import * as Bottle from 'bottlejs';
+import { mockBottlejsService, MockLogService } from '@elunic/logger';
+
+describe('my application test', () => {
+  let testBottle: Bottle;
+  let logService: MockLogService;
+  
+  beforeEach(async () => {
+    testBottle = new Bottle();
+    
+    // Mock log service
+    testBottle.factory('log', mockBottlejsService('apptest', 'silent'));
+    
+    logService = testBottle.container.log;    
+  });
+  
+  it('should call logs', async () => {
+    // ... do some actual testing here
+    
+    // logService.error is a sinon spy
+    expect(logService.error.callCount).toEqual(1);
+    
+    // We can to know about some child logger
+    const childLoggerSpy = logService.getLogger('apptest:component');
+    expect(childLoggerSpy.error.callCount).toEqual(1);
+  });
+});
+```
