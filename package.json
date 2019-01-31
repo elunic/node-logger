@@ -1,6 +1,6 @@
 {
   "name": "@elunic/logger",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "A simple wrapper around winston which logs to console as well as multiple files, with child namespaces.",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -65,5 +65,8 @@
   "dependencies": {
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^3.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
