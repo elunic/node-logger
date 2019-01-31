@@ -24,6 +24,25 @@ export class MockLogService {
     return childLogger;
   }
 
+  get trace() {
+    return this.logger.trace;
+  }
+  get debug() {
+    return this.logger.debug;
+  }
+  get info() {
+    return this.logger.info;
+  }
+  get warn() {
+    return this.logger.warn;
+  }
+  get error() {
+    return this.logger.error;
+  }
+  get fatal() {
+    return this.logger.fatal;
+  }
+
   getLogger(fullNamespace: string): MockLogger | MockRootLogger | undefined {
     if (this.loggers.hasOwnProperty(fullNamespace)) {
       return this.loggers[fullNamespace];
