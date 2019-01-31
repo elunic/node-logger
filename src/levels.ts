@@ -11,9 +11,9 @@ export const levels = {
   },
   colors: {
     fatal: 'bold red',
-    error: 'bold orange',
+    error: 'red',
     warn: 'yellow',
-    info: 'green',
+    info: 'blue',
     debug: 'gray',
     trace: 'white',
   },

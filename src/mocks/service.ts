@@ -17,9 +17,10 @@ export class MockLogService {
   }
 
   createLogger(childNamespace: string): MockLogger {
-    const childLogger = new MockLogger(`${this.namespace}:${childNamespace}`, this.debugLevel);
+    const fullNamespace = `${this.namespace}:${childNamespace}`;
+    const childLogger = new MockLogger(fullNamespace, this.debugLevel);
 
-    this.loggers[childNamespace] = childLogger;
+    this.loggers[fullNamespace] = childLogger;
 
     return childLogger;
   }
