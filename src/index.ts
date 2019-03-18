@@ -6,6 +6,7 @@ import { levels } from './levels';
 import { Logger, RootLogger } from './logger';
 import { printf } from './printf';
 import { CreateLoggerOptions, CustomWinstonLogger, LogLevels } from './types';
+import { validateNamespace } from './validateNamespace';
 
 export { CreateLoggerOptions, Logger, RootLogger, LogLevels };
 export { LogService } from './service';
@@ -13,16 +14,6 @@ export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
 
 export * from './mocks';
-
-function validateNamespace(namespace: string) {
-  if (!namespace) {
-    throw new Error(`'namespace' must not be empty`);
-  }
-
-  if (!namespace.match(/^[\w-]+$/)) {
-    throw new Error(`Invalid characters in namespace: ${namespace.replace(/[\w-]/, '')}`);
-  }
-}
 
 const loggerCache: {
   [key: string]: RootLogger;

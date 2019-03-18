@@ -1,4 +1,4 @@
-# busboy-express
+# `@elunic/logger`
 
 [![Build Status](https://travis-ci.org/elunic/node-logger.svg?branch=master)](https://travis-ci.org/elunic/node-logger)
 
