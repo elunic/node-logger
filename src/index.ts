@@ -120,7 +120,7 @@ function createLogger(rootNamespace: string, rawOptions?: CreateLoggerOptions): 
     const childLogger = new Logger(
       namespace,
       rootWinstonLogger,
-      _createWinstonLogger(namespace, options),
+      options.logPath ? _createWinstonLogger(namespace, options) : undefined,
     );
 
     childLoggerCache[namespace] = childLogger;
