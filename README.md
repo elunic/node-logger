@@ -4,9 +4,11 @@
 
 A simple wrapper around `winston` which logs to console as well as multiple files (with INFO, DEBUG and ERROR levels), with child namespaces (single level).
 
+All loggers are `winston.Logger` instances, meaning you can add custom transports on top of the default convenience ones.
+
 Provides the `bunyan` error levels.
 
-Ships with TypeScript bindings.
+Written in TypeScript.
 
 
 ## Table of Contents
@@ -28,6 +30,20 @@ $ npm install @elunic/logger
 ```
 
 
+## Functionality
+
+`createLogger()` (root as well as child) returns a `winston` logger with a default `Console` transport attached to it that 
+logs the colorized log level to the console.
+
+If the root logger is passed the `logPath` option during creation, three files will be created per namespace: one for each of the
+INFO, DEBUG and ERROR levels (DEBUG will contain all messages at or above the DEBUG level, and so on).
+
+Subfolders are created for the child loggers' files.
+
+Log messages from the child loggers *also* get logged through the root logger, which means that the console output *and* the
+root logger's log files contain *all* messages, but you can drill down to child logs quickly.
+
+
 ## Usage
 
 ```javascript
@@ -36,6 +52,10 @@ const createLogger = require('@elunic/logger');
 const logger = createLogger('app', {
   consoleLevel: process.env.LOG_LEVEL || 'info',
   logPath: process.cwd() + '/logs',
+  // Winston logger options
+  loggerOptions: {
+    silent: false,
+  },
 });
 
 logger('information about regular operation');
@@ -58,6 +78,9 @@ logger.debug('debug information, perhaps useful during development or troublesho
 
 logger.trace('highly detailed information');
 // 2019-01-31T10:40:31Z TRACE [app] highly detailed information
+
+// Add another Console transport, just for kicks.
+logger.add(new winston.transport.Console());
 ```
 
 
@@ -70,6 +93,9 @@ childLogger.info('information about regular operation');
 
 // Will NOT work
 const grandChildLogger = childLogger.createLogger('invalid');
+
+// This is also a winston.Logger instance.
+logger.add(new winston.transport.Console());
 ```
 
 
@@ -82,7 +108,21 @@ the log files.
 
 If your first call to `createLogger()` sets a `consoleLevel` or `logPath`
 option, those options will subsequently be re-used, even if you
-pass different options while declaring a DI service (see below).
+pass different options.
+
+If you need to re-use a logger for a namespace, use `getLogger('namespace')`
+to retrieve a previously created logger instance.
+
+
+### Retrieve existing loggers
+
+```javascript
+const {getLogger} = require('@elunic/logger');
+
+const rootLogger = getLogger('app');
+
+rootLogger.info('info');
+```
 
 
 ### `awilix` service function factory
@@ -92,12 +132,13 @@ const awilix = require('awilix');
 const {awilixLogService} = require('@elunic/logger');
 
 const container = awilix.createContainer();
+const logger = createLogger('app', {
+  consoleLevel: process.env.LOG_LEVEL || 'info',
+  logPath: process.cwd() + '/logs',
+});
 
 container.register({
-  log: awilix.asFunction(awilixLogService('app', {
-    consoleLevel: process.env.LOG_LEVEL || 'info',
-    logPath: process.cwd() + '/logs',
-  })),
+  log: awilix.asFunction(awilixLogService(logger)),
 })
 ```
 
@@ -109,11 +150,12 @@ const Bottle = require('bottlejs');
 const {bottlejsLogService} = require('@elunic/logger');
 
 const bottle = new Bottle();
-
-bottle.factory('log', bottlejsLogService('app', {
+const logger = createLogger('app', {
   consoleLevel: process.env.LOG_LEVEL || 'info',
   logPath: process.cwd() + '/logs',
-}));
+});
+
+bottle.factory('log', bottlejsLogService(logger));
 ```
 
 
@@ -137,7 +179,7 @@ check whether spies have been called.
 
 ```typescript
 import * as Bottle from 'bottlejs';
-import { mockBottlejsLogService, MockLogService } from '@elunic/logger';
+import { mockBottlejsLogService, MockLogService } from '@elunic/logger/mocks';
 
 describe('my application test', () => {
   let testBottle: Bottle;

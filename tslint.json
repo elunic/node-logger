@@ -1,15 +1,6 @@
 {
-  "extends": [
-    "gts/tslint.json",
-    "tslint-config-prettier"
-  ],
+  "extends": "@elunic/ecs/tslint/tslint.json",
   "rules": {
-    "ordered-imports": [
-      true,
-      {
-        "grouped-imports": true
-      }
-    ],
     "no-default-export": false
   }
 }

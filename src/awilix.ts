@@ -1,7 +1,8 @@
-import { CreateLoggerOptions, LogService } from './index';
+import { LogService } from './index';
+import { CustomRootWinstonLogger } from './types';
 
-export function awilixLogService(rootNamespace: string, options?: CreateLoggerOptions) {
+export function awilixLogService(logger: CustomRootWinstonLogger) {
   return function awilixServiceFactory() {
-    return new LogService(rootNamespace, options);
+    return new LogService(logger);
   };
 }

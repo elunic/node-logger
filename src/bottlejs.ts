@@ -1,7 +1,8 @@
-import { CreateLoggerOptions, LogService } from './index';
+import { LogService } from './index';
+import { CustomRootWinstonLogger } from './types';
 
-export function bottlejsLogService(rootNamespace: string, options?: CreateLoggerOptions) {
+export function bottlejsLogService(logger: CustomRootWinstonLogger) {
   return function bottlejsServiceFactory() {
-    return new LogService(rootNamespace, options);
+    return new LogService(logger);
   };
 }

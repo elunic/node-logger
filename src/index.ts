@@ -3,30 +3,37 @@ import * as winston from 'winston';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
 
 import { levels } from './levels';
-import { Logger, RootLogger } from './logger';
 import { printf } from './printf';
-import { CreateLoggerOptions, CustomWinstonLogger, LogLevels } from './types';
+import {
+  CreateChildLoggerOptions,
+  CreateLoggerOptions,
+  CustomRootWinstonLogger,
+  CustomWinstonLogger,
+  LogLevels,
+} from './types';
 import { validateNamespace } from './validateNamespace';
 
-export { CreateLoggerOptions, Logger, RootLogger, LogLevels };
+export { CreateLoggerOptions, LogLevels };
 export { LogService } from './service';
 export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
-
-export * from './mocks';
+export { CustomRootWinstonLogger as RootLogger, CustomWinstonLogger as Logger };
 
 const loggerCache: {
-  [key: string]: RootLogger;
+  [key: string]: CustomRootWinstonLogger;
 } = {};
 const childLoggerCache: {
-  [key: string]: Logger;
+  [key: string]: CustomWinstonLogger;
 } = {};
 
-function createLogger(rootNamespace: string, rawOptions?: CreateLoggerOptions): RootLogger {
+function createLogger(
+  rootNamespace: string,
+  rawOptions?: CreateLoggerOptions,
+): CustomRootWinstonLogger {
   validateNamespace(rootNamespace);
 
   if (loggerCache.hasOwnProperty(rootNamespace)) {
-    return loggerCache[rootNamespace];
+    throw new Error(`A logger for the namespace '${rootNamespace}' already exists.`);
   }
 
   const options = Object.assign(
@@ -34,12 +41,17 @@ function createLogger(rootNamespace: string, rawOptions?: CreateLoggerOptions): 
     {
       consoleLevel: LogLevels.Info,
       logPath: undefined,
+      loggerOptions: undefined,
     },
     rawOptions || {},
   );
 
-  const rootWinstonLogger = _createWinstonLogger(rootNamespace, options);
-  rootWinstonLogger.add(
+  const rootLogger = _createWinstonLogger(
+    rootNamespace,
+    options.logPath,
+    options.loggerOptions,
+  ) as CustomRootWinstonLogger;
+  rootLogger.add(
     new winston.transports.Console({
       level: options.consoleLevel || 'info',
       format: winston.format.combine(
@@ -52,17 +64,24 @@ function createLogger(rootNamespace: string, rawOptions?: CreateLoggerOptions): 
     }),
   );
 
-  const rootLogger = new Logger(rootNamespace, rootWinstonLogger);
-
   function _createWinstonLogger(
     namespace: string,
-    options: CreateLoggerOptions,
+    logPath?: string,
+    loggerOptions?: winston.LoggerOptions,
   ): CustomWinstonLogger {
     const winstonLogger = winston.createLogger({
       levels: levels.levels,
+      ...(loggerOptions || {}),
     }) as CustomWinstonLogger;
 
-    if (options.logPath) {
+    Object.defineProperty(winstonLogger, 'namespace', {
+      configurable: false,
+      enumerable: true,
+      value: namespace,
+      writable: false,
+    });
+
+    if (logPath) {
       let relativeLogPath: string;
       if (namespace === rootNamespace) {
         relativeLogPath = '';
@@ -72,7 +91,7 @@ function createLogger(rootNamespace: string, rawOptions?: CreateLoggerOptions): 
           .replace(':', path.sep);
       }
 
-      const dirname = path.join(options.logPath, relativeLogPath);
+      const dirname = path.join(logPath, relativeLogPath);
 
       const fileFormat = winston.format.combine(
         winston.format.timestamp(),
@@ -108,29 +127,48 @@ function createLogger(rootNamespace: string, rawOptions?: CreateLoggerOptions): 
     return winstonLogger;
   }
 
-  function createLogger(childNamespace: string): Logger {
+  function createChildLogger(
+    childNamespace: string,
+    rawChildOptions?: CreateChildLoggerOptions,
+  ): CustomWinstonLogger {
+    const childOptions = Object.assign(
+      {},
+      {
+        loggerOptions: undefined,
+      },
+      rawChildOptions || {},
+    );
+
     validateNamespace(childNamespace);
 
     const namespace = `${rootNamespace}:${childNamespace}`;
 
     if (childLoggerCache.hasOwnProperty(namespace)) {
-      return childLoggerCache[namespace];
+      throw new Error(`A logger for the namespace '${namespace}' already exists.`);
     }
 
-    const childLogger = new Logger(
-      namespace,
-      rootWinstonLogger,
-      options.logPath ? _createWinstonLogger(namespace, options) : undefined,
-    );
+    const childLogger = _createWinstonLogger(namespace, undefined, childOptions.loggerOptions);
+    childLogger.pipe(rootLogger);
 
     childLoggerCache[namespace] = childLogger;
     return childLogger;
   }
 
-  (rootLogger as RootLogger).createLogger = createLogger.bind(rootLogger);
-  loggerCache[rootNamespace] = rootLogger as RootLogger;
-  return rootLogger as RootLogger;
+  rootLogger.createLogger = createChildLogger.bind(rootLogger);
+  loggerCache[rootNamespace] = rootLogger;
+  return rootLogger;
 }
 
 export default createLogger;
 export { createLogger };
+
+export function getLogger(namespace: string): CustomWinstonLogger | undefined {
+  if (loggerCache.hasOwnProperty(namespace)) {
+    return loggerCache[namespace] || undefined;
+  }
+  if (childLoggerCache.hasOwnProperty(namespace)) {
+    return childLoggerCache[namespace] || undefined;
+  }
+
+  return undefined;
+}
