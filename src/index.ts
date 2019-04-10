@@ -1,3 +1,4 @@
+import * as logform from 'logform';
 import * as path from 'path';
 import * as winston from 'winston';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
@@ -19,7 +20,7 @@ export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
 export { CustomRootWinstonLogger as RootLogger, CustomWinstonLogger as Logger };
 
-export const defaultFormat = winston.format.combine(
+export const defaultFormat: logform.Format = winston.format.combine(
   winston.format.timestamp(),
   winston.format.printf(printf),
 );
