@@ -11,12 +11,13 @@
   "scripts": {
     "test": "npm run clean && npm run compile && npx jasmine 'dist/test/**/*.spec.js' && npm run check",
     "test:watch": "npm run clean && npx tsc-watch --onSuccess \"npx jasmine 'dist/test/**/*.spec.js'\" --preserveWatchOutput -w --noEmitOnError false",
-    "compile": "npm run clean && tsc -p .",
-    "compile:prod": "npm run clean && tsc -p tsconfig.prod.json",
+    "compile": "tsc -p .",
+    "compile:prod": "tsc -p tsconfig.prod.json",
     "clean": "shx rm -rf dist/",
     "check": "tslint -c tslint.fix.json '{src,test}/**/*.{ts,js}' && prettier --config ./prettier.config.js --check '{src,test}/**/*.{ts,js}'",
     "fix": "tslint -c tslint.fix.json --fix '{src,test}/**/*.{ts,js}' && prettier --config ./prettier.config.js --write '{src,test}/**/*.{ts,js}'",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "dist": "npm run clean && npm run compile:prod && mv dist/src/* ."
   },
   "husky": {
     "hooks": {

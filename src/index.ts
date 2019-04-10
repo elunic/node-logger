@@ -1,10 +1,9 @@
-import * as logform from 'logform';
 import * as path from 'path';
 import * as winston from 'winston';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
 
+import { defaultFormat } from './defaultFormat';
 import { levels } from './levels';
-import { printf } from './printf';
 import {
   CreateChildLoggerOptions,
   CreateLoggerOptions,
@@ -15,15 +14,11 @@ import {
 import { validateNamespace } from './validateNamespace';
 
 export { CreateLoggerOptions, LogLevels };
+export { defaultFormat };
 export { LogService } from './service';
 export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
 export { CustomRootWinstonLogger as RootLogger, CustomWinstonLogger as Logger };
-
-export const defaultFormat: logform.Format = winston.format.combine(
-  winston.format.timestamp(),
-  winston.format.printf(printf),
-);
 
 const loggerCache: {
   [key: string]: CustomRootWinstonLogger;
