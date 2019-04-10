@@ -36,24 +36,24 @@ export class MockLogger {
     }
 
     this.fakes = {
-      trace: sinon.fake((...args: Array<unknown>) =>
+      trace: sinon.fake((...args: unknown[]) =>
         // tslint:disable-next-line:no-console
         numDebugLevel <= 10 ? console.debug(`TRACE [${namespace}]`, ...args) : undefined,
       ),
-      debug: sinon.fake((...args: Array<unknown>) =>
+      debug: sinon.fake((...args: unknown[]) =>
         // tslint:disable-next-line:no-console
         numDebugLevel <= 20 ? console.debug(`DEBUG [${namespace}]`, ...args) : undefined,
       ),
-      info: sinon.fake((...args: Array<unknown>) =>
+      info: sinon.fake((...args: unknown[]) =>
         numDebugLevel <= 30 ? console.log(` INFO [${namespace}]`, ...args) : undefined,
       ),
-      warn: sinon.fake((...args: Array<unknown>) =>
+      warn: sinon.fake((...args: unknown[]) =>
         numDebugLevel <= 40 ? console.warn(` WARN [${namespace}]`, ...args) : undefined,
       ),
-      error: sinon.fake((...args: Array<unknown>) =>
+      error: sinon.fake((...args: unknown[]) =>
         numDebugLevel <= 50 ? console.error(`ERROR [${namespace}]`, ...args) : undefined,
       ),
-      fatal: sinon.fake((...args: Array<unknown>) =>
+      fatal: sinon.fake((...args: unknown[]) =>
         numDebugLevel <= 60 ? console.error(`FATAL [${namespace}]`, ...args) : undefined,
       ),
     };

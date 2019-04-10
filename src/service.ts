@@ -13,22 +13,22 @@ export class LogService {
     return this.logger.createLogger(childNamespace);
   }
 
-  trace(...msgs: Array<unknown>): void {
+  trace(...msgs: unknown[]): void {
     this.logger.trace(...msgs);
   }
-  debug(...msgs: Array<unknown>): void {
+  debug(...msgs: unknown[]): void {
     this.logger.debug(...msgs);
   }
-  info(...msgs: Array<unknown>): void {
+  info(...msgs: unknown[]): void {
     this.logger.info(...msgs);
   }
-  warn(...msgs: Array<unknown>): void {
+  warn(...msgs: unknown[]): void {
     this.logger.warn(...msgs);
   }
-  error(...msgs: Array<unknown>): void {
+  error(...msgs: unknown[]): void {
     this.logger.error(...msgs);
   }
-  fatal(...msgs: Array<unknown>): void {
+  fatal(...msgs: unknown[]): void {
     this.logger.fatal(...msgs);
   }
 

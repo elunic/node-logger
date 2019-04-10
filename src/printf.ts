@@ -30,12 +30,7 @@ export function printf(info: logform.TransformableInfo) {
       }
     }
   }
-  return (
-    '' +
-    `${info.timestamp}` +
-    ` ${levelLabel(info.level)}` +
-    // ` ${info.level}` +
-    ` ${info.message}` +
-    ''
-  );
+
+  const namespace = info.namespace ? ` [${info.namespace}]` : '';
+  return `${info.timestamp} ${levelLabel(info.level)}${namespace} ${info.message}`;
 }

@@ -12,12 +12,12 @@ export enum LogLevels {
 export interface CustomWinstonLogger extends winston.Logger {
   namespace: string;
 
-  trace: (...msgs: Array<unknown>) => CustomWinstonLogger;
-  debug: (...msgs: Array<unknown>) => CustomWinstonLogger;
-  info: (...msgs: Array<unknown>) => CustomWinstonLogger;
-  warn: (...msgs: Array<unknown>) => CustomWinstonLogger;
-  error: (...msgs: Array<unknown>) => CustomWinstonLogger;
-  fatal: (...msgs: Array<unknown>) => CustomWinstonLogger;
+  trace: (...msgs: unknown[]) => CustomWinstonLogger;
+  debug: (...msgs: unknown[]) => CustomWinstonLogger;
+  info: (...msgs: unknown[]) => CustomWinstonLogger;
+  warn: (...msgs: unknown[]) => CustomWinstonLogger;
+  error: (...msgs: unknown[]) => CustomWinstonLogger;
+  fatal: (...msgs: unknown[]) => CustomWinstonLogger;
 }
 
 export interface CustomRootWinstonLogger extends CustomWinstonLogger {

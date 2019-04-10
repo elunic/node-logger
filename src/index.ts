@@ -19,6 +19,11 @@ export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
 export { CustomRootWinstonLogger as RootLogger, CustomWinstonLogger as Logger };
 
+export const defaultFormat = winston.format.combine(
+  winston.format.timestamp(),
+  winston.format.printf(printf),
+);
+
 const loggerCache: {
   [key: string]: CustomRootWinstonLogger;
 } = {};
@@ -58,8 +63,9 @@ function createLogger(
         winston.format.colorize({
           colors: levels.colors,
         }),
-        winston.format.timestamp(),
-        winston.format.printf(printf),
+        defaultFormat,
+        // winston.format.timestamp(),
+        // winston.format.printf(printf),
       ),
     }),
   );
@@ -72,6 +78,10 @@ function createLogger(
     const winstonLogger = winston.createLogger({
       levels: levels.levels,
       ...(loggerOptions || {}),
+      defaultMeta: {
+        ...(loggerOptions && loggerOptions.defaultMeta ? loggerOptions.defaultMeta : {}),
+        namespace,
+      },
     }) as CustomWinstonLogger;
 
     Object.defineProperty(winstonLogger, 'namespace', {
@@ -94,8 +104,9 @@ function createLogger(
       const dirname = path.join(logPath, relativeLogPath);
 
       const fileFormat = winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.printf(printf),
+        defaultFormat,
+        // winston.format.timestamp(),
+        // winston.format.printf(printf),
       );
 
       winstonLogger.add(
