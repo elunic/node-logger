@@ -19,6 +19,7 @@ jobs:
       before_deploy:
         - npm run clean
         - npm run compile:prod
+        - cp -r dist/src/* .
       deploy:
         provider: npm
         email: "$NPM_EMAIL"
