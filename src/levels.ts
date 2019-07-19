@@ -1,5 +1,3 @@
-import * as winston from 'winston';
-
 export const levels = {
   levels: {
     fatal: 0,

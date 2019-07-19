@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/gts/tsconfig-google.json",
+  "extends": "./node_modules/@elunic/ecs/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "./",
     "outDir": "./dist",
@@ -7,7 +7,9 @@
       "esnext"
     ],
     "target": "es5",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "src/*.ts",

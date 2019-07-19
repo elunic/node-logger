@@ -2,6 +2,4 @@ dist/
 test/
 src/
 .*
-commitlint.config.js
-prettier.config.js
 *.json

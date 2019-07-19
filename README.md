@@ -19,6 +19,7 @@ Written in TypeScript.
   * [Important notes](#important-notes)
   * [`awilix` service function factory](#awilix-service-function-factory)
   * [`bottlejs` service function factory](#bottlejs-service-function-factory)
+  * [`nestjs` service function factory](#nestjs-service-function-factory)
 - [Mock usage](#mock-usage)
 - [License](#license)
 
@@ -129,7 +130,7 @@ rootLogger.info('info');
 
 ```javascript
 const awilix = require('awilix');
-const {awilixLogService} = require('@elunic/logger');
+const {createLogger, awilixLogService} = require('@elunic/logger');
 
 const container = awilix.createContainer();
 const logger = createLogger('app', {
@@ -147,7 +148,7 @@ container.register({
 
 ```javascript
 const Bottle = require('bottlejs');
-const {bottlejsLogService} = require('@elunic/logger');
+const {createLogger, bottlejsLogService} = require('@elunic/logger');
 
 const bottle = new Bottle();
 const logger = createLogger('app', {
@@ -159,10 +160,44 @@ bottle.factory('log', bottlejsLogService(logger));
 ```
 
 
+### `nestjs` service function factory
+
+```typescript
+import { Module, Injectable, Inject } from '@nestjs/common';
+import { createLogger, LogService } from '@elunic/logger';
+import { LoggerModule, LOGGER } from '@elunic/logger/nestjs';
+
+const logger = createLogger('app');
+
+@Module({
+  imports: [
+    LoggerModule.forRoot(logger),
+  ],
+  providers: [HelperService],
+})
+export class AppModule {}
+
+@Injectable()
+class HelperService {
+  constructor(@Inject(LOGGER) private log: LogService) {
+  }
+
+  logFoo() {
+    this.log.info('foo');
+  }
+  
+  logChild() {
+    this.log.createLogger('childLogger').info('child foo');
+  }
+}
+```
+
+
+
 ## Mock usage
 
 Mocks for the service are included, both for `awilix` 
-and `bottlejs` registration. These are to help you when writing
+and `bottlejs` as well as `nestjs` registration. These are to help you when writing
 tests so they do not crash. They are silent be default (see below).
 
 Note that the arguments are slightly different than for the 
@@ -174,6 +209,8 @@ debugging.
 
 The service can be accessed to retrieve single logger instances and
 check whether spies have been called.
+
+### `bottlejs`/`awilix` example
 
 (the example is for `bottlejs`, but works in an analogeous way for `awilix`)
 
@@ -192,6 +229,40 @@ describe('my application test', () => {
     testBottle.factory('log', mockBottlejsLogService('apptest', 'silent'));
     
     logService = testBottle.container.log;    
+  });
+  
+  it('should call logs', async () => {
+    // ... do some actual testing here
+    
+    // logService.error is a sinon spy
+    expect(logService.error.callCount).toEqual(1);
+    
+    // We can to know about some child logger
+    const childLoggerSpy = logService.getLogger('apptest:component');
+    expect(childLoggerSpy.error.callCount).toEqual(1);
+  });
+});
+```
+
+### `nestjs` example
+
+Image that `CatsService` depends on our `LogService`:
+
+```typescript
+import { MockNestjsLoggerModule, MockLogService } from '@elunic/logger/mocks';
+import { CatsService } from './cats.service';
+
+describe('NestJS module', () => {
+  let catsService: CatsService;
+  let logService: MockLogService;
+  
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+        imports: [MockNestjsLoggerModule],
+        providers: [CatsService],
+      }).compile();
+
+    catsService = module.get<CatsService>(CatsService);
   });
   
   it('should call logs', async () => {
