@@ -6,31 +6,35 @@ import { defaultFormat } from './defaultFormat';
 import { levels } from './levels';
 import {
   CreateChildLoggerOptions,
-  CreateLoggerOptions,
-  CustomRootWinstonLogger,
-  CustomWinstonLogger,
+  CreateRootLoggerOptions,
+  Logger,
   LogLevels,
+  RootLogger,
 } from './types';
 import { validateNamespace } from './validateNamespace';
 
-export { CreateLoggerOptions, LogLevels };
+export { CreateRootLoggerOptions, LogLevels };
 export { defaultFormat };
 export { LogService } from './service';
 export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
-export { CustomRootWinstonLogger as RootLogger, CustomWinstonLogger as Logger };
+
+export { RootLogger, Logger };
+export {
+  CustomRootWinstonLogger,
+  CustomWinstonLogger,
+  CreateLoggerOptions,
+  CreateChildLoggerOptions,
+} from './types';
 
 const loggerCache: {
-  [key: string]: CustomRootWinstonLogger;
+  [key: string]: RootLogger;
 } = {};
 const childLoggerCache: {
-  [key: string]: CustomWinstonLogger;
+  [key: string]: Logger;
 } = {};
 
-function createLogger(
-  rootNamespace: string,
-  rawOptions?: CreateLoggerOptions,
-): CustomRootWinstonLogger {
+function createLogger(rootNamespace: string, rawOptions?: CreateRootLoggerOptions): RootLogger {
   validateNamespace(rootNamespace);
 
   if (loggerCache.hasOwnProperty(rootNamespace)) {
@@ -51,7 +55,7 @@ function createLogger(
     rootNamespace,
     options.logPath,
     options.loggerOptions,
-  ) as CustomRootWinstonLogger;
+  ) as RootLogger;
   rootLogger.add(
     new winston.transports.Console({
       level: options.consoleLevel || 'info',
@@ -70,7 +74,7 @@ function createLogger(
     namespace: string,
     logPath?: string,
     loggerOptions?: winston.LoggerOptions,
-  ): CustomWinstonLogger {
+  ): Logger {
     const winstonLogger = winston.createLogger({
       levels: levels.levels,
       ...(loggerOptions || {}),
@@ -78,7 +82,7 @@ function createLogger(
         ...(loggerOptions && loggerOptions.defaultMeta ? loggerOptions.defaultMeta : {}),
         namespace,
       },
-    }) as CustomWinstonLogger;
+    }) as Logger;
 
     Object.defineProperty(winstonLogger, 'namespace', {
       configurable: false,
@@ -137,7 +141,7 @@ function createLogger(
   function createChildLogger(
     childNamespace: string,
     rawChildOptions?: CreateChildLoggerOptions,
-  ): CustomWinstonLogger {
+  ): Logger {
     const childOptions = Object.assign(
       {},
       {
@@ -169,7 +173,7 @@ function createLogger(
 export default createLogger;
 export { createLogger };
 
-export function getLogger(namespace: string): CustomWinstonLogger | undefined {
+export function getLogger(namespace: string): Logger | undefined {
   if (loggerCache.hasOwnProperty(namespace)) {
     return loggerCache[namespace] || undefined;
   }

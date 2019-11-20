@@ -9,22 +9,22 @@ export enum LogLevels {
   Fatal = 'fatal',
 }
 
-export interface CustomWinstonLogger extends winston.Logger {
+export interface Logger extends winston.Logger {
   namespace: string;
 
-  trace: (...msgs: unknown[]) => CustomWinstonLogger;
-  debug: (...msgs: unknown[]) => CustomWinstonLogger;
-  info: (...msgs: unknown[]) => CustomWinstonLogger;
-  warn: (...msgs: unknown[]) => CustomWinstonLogger;
-  error: (...msgs: unknown[]) => CustomWinstonLogger;
-  fatal: (...msgs: unknown[]) => CustomWinstonLogger;
+  trace: (...msgs: unknown[]) => Logger;
+  debug: (...msgs: unknown[]) => Logger;
+  info: (...msgs: unknown[]) => Logger;
+  warn: (...msgs: unknown[]) => Logger;
+  error: (...msgs: unknown[]) => Logger;
+  fatal: (...msgs: unknown[]) => Logger;
 }
 
-export interface CustomRootWinstonLogger extends CustomWinstonLogger {
-  createLogger: (childNamespace: string) => CustomWinstonLogger;
+export interface RootLogger extends Logger {
+  createLogger: (childNamespace: string) => Logger;
 }
 
-export interface CreateLoggerOptions {
+export interface CreateRootLoggerOptions {
   consoleLevel: LogLevels;
   logPath?: string;
   loggerOptions?: winston.LoggerOptions;
@@ -33,3 +33,16 @@ export interface CreateLoggerOptions {
 export interface CreateChildLoggerOptions {
   loggerOptions?: winston.LoggerOptions;
 }
+
+/**
+ * @deprecated
+ */
+export interface CustomRootWinstonLogger extends RootLogger {} // tslint:disable-line:no-empty-interface
+/**
+ * @deprecated
+ */
+export interface CustomWinstonLogger extends Logger {} // tslint:disable-line:no-empty-interface
+/**
+ * @deprecated
+ */
+export interface CreateLoggerOptions extends CreateRootLoggerOptions {} // tslint:disable-line:no-empty-interface

@@ -1,7 +1,7 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 
 import { LogService } from '../service';
-import { CustomRootWinstonLogger, CustomWinstonLogger } from '../types';
+import { Logger, RootLogger } from '../types';
 
 import { loggerNamespaces } from './inject-logger.decorator';
 
@@ -10,9 +10,9 @@ export const LOGGER = Symbol('LOGGER');
 @Global()
 @Module({})
 export class LoggerModule {
-  static forRoot(logger: CustomRootWinstonLogger): DynamicModule {
+  static forRoot(logger: RootLogger): DynamicModule {
     const services: Map<string, LogService> = new Map();
-    function createLogService(fromLogger: CustomWinstonLogger) {
+    function createLogService(fromLogger: Logger) {
       if (!services.has(fromLogger.namespace)) {
         services.set(fromLogger.namespace, new LogService(fromLogger));
       }

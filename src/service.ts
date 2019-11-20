@@ -1,20 +1,20 @@
 import * as winston from 'winston';
 
-import { CustomRootWinstonLogger, CustomWinstonLogger } from './types';
+import { Logger, RootLogger } from './types';
 
 export class LogService {
   get namespace() {
     return this.logger.namespace;
   }
 
-  constructor(private logger: CustomRootWinstonLogger | CustomWinstonLogger) {}
+  constructor(private logger: RootLogger | Logger) {}
 
-  createLogger(childNamespace: string): CustomWinstonLogger {
+  createLogger(childNamespace: string): Logger {
     if (this.logger.namespace.includes(':')) {
       throw new Error(`Cannot create child logger on non-root logger.`);
     }
 
-    return (this.logger as CustomRootWinstonLogger).createLogger(childNamespace);
+    return (this.logger as RootLogger).createLogger(childNamespace);
   }
 
   trace(...msgs: unknown[]): void {
