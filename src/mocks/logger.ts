@@ -83,4 +83,8 @@ export class MockRootLogger extends MockLogger {
   constructor(public namespace: string, public debugLevel: LogLevels | 'silent' = 'silent') {
     super(namespace, debugLevel);
   }
+
+  createLogger(childNamespace: string): MockLogger {
+    return new MockLogger(`${this.namespace}:${childNamespace}`, this.debugLevel);
+  }
 }

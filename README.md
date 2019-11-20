@@ -192,6 +192,55 @@ class HelperService {
 }
 ```
 
+#### The `@InjectLogger()` Decorator
+
+As an alternative, a child logger can be injected directly, without
+having to inject the root log service to create a logger in  a second
+step.
+
+The `@InjectLogger()` decorator takes a **namespace string as argument**.
+
+If no argument is passed, the root LogService is returned.
+
+```typescript
+import { Module, Injectable, Inject } from '@nestjs/common';
+import { createLogger, LogService } from '@elunic/logger';
+import { LoggerModule, InjectLogger } from '@elunic/logger/nestjs';
+
+const logger = createLogger('app');
+
+@Module({
+  imports: [
+    LoggerModule.forRoot(logger),
+  ],
+  providers: [HelperService],
+})
+export class AppModule {}
+
+@Injectable()
+class HelperService {
+  constructor(
+    @InjectLogger('helper') private log: LogService,
+    @InjectLogger() private rootLog: LogService,
+    ) {
+  }
+
+  logFoo() {
+    // This will output "INFO [app:helper] foo"
+    this.log.info('foo');
+  }
+
+  logRootFoo() {
+    // This will output "INFO [app] foo"
+    this.rootLog.info('foo');
+  }
+  
+  logChild() {
+    // This will NOT work here, our logger is already a child logger.
+    // this.log.createLogger('childLogger').info('child foo');
+  }
+}
+```
 
 
 ## Mock usage

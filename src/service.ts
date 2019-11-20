@@ -7,10 +7,14 @@ export class LogService {
     return this.logger.namespace;
   }
 
-  constructor(private logger: CustomRootWinstonLogger) {}
+  constructor(private logger: CustomRootWinstonLogger | CustomWinstonLogger) {}
 
   createLogger(childNamespace: string): CustomWinstonLogger {
-    return this.logger.createLogger(childNamespace);
+    if (this.logger.namespace.includes(':')) {
+      throw new Error(`Cannot create child logger on non-root logger.`);
+    }
+
+    return (this.logger as CustomRootWinstonLogger).createLogger(childNamespace);
   }
 
   trace(...msgs: unknown[]): void {
