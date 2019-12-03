@@ -27,19 +27,8 @@ export {
   CreateChildLoggerOptions,
 } from './types';
 
-const loggerCache: {
-  [key: string]: RootLogger;
-} = {};
-const childLoggerCache: {
-  [key: string]: Logger;
-} = {};
-
 function createLogger(rootNamespace: string, rawOptions?: CreateRootLoggerOptions): RootLogger {
   validateNamespace(rootNamespace);
-
-  if (loggerCache.hasOwnProperty(rootNamespace)) {
-    throw new Error(`A logger for the namespace '${rootNamespace}' already exists.`);
-  }
 
   const options = Object.assign(
     {},
@@ -154,32 +143,15 @@ function createLogger(rootNamespace: string, rawOptions?: CreateRootLoggerOption
 
     const namespace = `${rootNamespace}:${childNamespace}`;
 
-    if (childLoggerCache.hasOwnProperty(namespace)) {
-      throw new Error(`A logger for the namespace '${namespace}' already exists.`);
-    }
-
     const childLogger = _createWinstonLogger(namespace, undefined, childOptions.loggerOptions);
     childLogger.pipe(rootLogger);
 
-    childLoggerCache[namespace] = childLogger;
     return childLogger;
   }
 
   rootLogger.createLogger = createChildLogger.bind(rootLogger);
-  loggerCache[rootNamespace] = rootLogger;
   return rootLogger;
 }
 
 export default createLogger;
 export { createLogger };
-
-export function getLogger(namespace: string): Logger | undefined {
-  if (loggerCache.hasOwnProperty(namespace)) {
-    return loggerCache[namespace] || undefined;
-  }
-  if (childLoggerCache.hasOwnProperty(namespace)) {
-    return childLoggerCache[namespace] || undefined;
-  }
-
-  return undefined;
-}

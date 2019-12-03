@@ -2,6 +2,11 @@
 
 [![Build Status](https://travis-ci.org/elunic/node-logger.svg?branch=master)](https://travis-ci.org/elunic/node-logger)
 
+**Important breaking change in v3.0.0**: logger instances are no
+longer unique, calling `createLogger()` with the same namespace twice
+returns two different instances, and `getLogger()` has been removed
+(`MockLogService.getLogger()` is still there).
+
 A simple wrapper around `winston` which logs to console as well as multiple files (with INFO, DEBUG and ERROR levels), with child namespaces (single level).
 
 All loggers are `winston.Logger` instances, meaning you can add custom transports on top of the default convenience ones.
@@ -102,28 +107,13 @@ logger.add(new winston.transport.Console());
 
 ### Important notes
 
-The **first** call to `createLogger()` will determine the options
-used for that namespace. Loggers are cached, mainly for performance 
-reasons as well as to prevent concurrency issues when writing to
-the log files.
+Each call to `createLogger()` creates a **separate logger instance**, even if you call
+it twice with the same namespace. Handling of duplicates turned out to
+be too prone to errors and edge cases. If you absolutely need singleton
+loggers, implement it for your use case.
 
-If your first call to `createLogger()` sets a `consoleLevel` or `logPath`
-option, those options will subsequently be re-used, even if you
-pass different options.
-
-If you need to re-use a logger for a namespace, use `getLogger('namespace')`
-to retrieve a previously created logger instance.
-
-
-### Retrieve existing loggers
-
-```javascript
-const {getLogger} = require('@elunic/logger');
-
-const rootLogger = getLogger('app');
-
-rootLogger.info('info');
-```
+On the other hand, this means you can pass distinct options on both calls,
+if that is a use case (for whatever reason).
 
 
 ### `awilix` service function factory

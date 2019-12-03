@@ -21,7 +21,7 @@ export interface Logger extends winston.Logger {
 }
 
 export interface RootLogger extends Logger {
-  createLogger: (childNamespace: string) => Logger;
+  createLogger: (childNamespace: string, childOptions?: CreateChildLoggerOptions) => Logger;
 }
 
 export interface CreateRootLoggerOptions {

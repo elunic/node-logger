@@ -1,7 +1,7 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 
 import { LogService } from '../service';
-import { Logger, RootLogger } from '../types';
+import { RootLogger } from '../types';
 
 import { loggerNamespaces } from './inject-logger.decorator';
 
@@ -11,30 +11,22 @@ export const LOGGER = Symbol('LOGGER');
 @Module({})
 export class LoggerModule {
   static forRoot(logger: RootLogger): DynamicModule {
-    const services: Map<string, LogService> = new Map();
-    function createLogService(fromLogger: Logger) {
-      if (!services.has(fromLogger.namespace)) {
-        services.set(fromLogger.namespace, new LogService(fromLogger));
-      }
-      return services.get(fromLogger.namespace);
-    }
-
     const providers: Provider[] = [
       {
         provide: LOGGER,
-        useFactory: () => createLogService(logger),
+        useFactory: () => new LogService(logger),
       },
     ];
 
-    for (const [logNamespace, injectionToken] of Array.from(loggerNamespaces)) {
+    for (const [logNamespace, [injectionToken, rawChildOptions]] of Array.from(loggerNamespaces)) {
       providers.push({
         provide: injectionToken,
         useFactory: () => {
           if (typeof logNamespace === 'string') {
-            return createLogService(logger.createLogger(logNamespace));
+            return new LogService(logger.createLogger(logNamespace, rawChildOptions));
           } else {
             // Currently, the only symbol identifies the root logger. [wh]
-            return createLogService(logger);
+            return new LogService(logger);
           }
         },
       });

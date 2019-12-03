@@ -1,6 +1,7 @@
-import { DynamicModule, Global, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 
 import { LOGGER } from '../nestjs';
+import { loggerNamespaces } from '../nestjs/inject-logger.decorator';
 import { LogLevels } from '../types';
 
 import { MockLogService } from './service';
@@ -12,12 +13,28 @@ export class MockNestjsLoggerModule {
     rootNamespace: string,
     debugLevel: LogLevels | 'silent' = 'silent',
   ): DynamicModule {
-    const providers = [
+    const providers: Provider[] = [
       {
         provide: LOGGER,
         useFactory: () => new MockLogService(rootNamespace, debugLevel),
       },
     ];
+
+    for (const [childNamespace, [injectionToken /*, rawChildOptions*/]] of Array.from(
+      loggerNamespaces,
+    )) {
+      providers.push({
+        provide: injectionToken,
+        useFactory: () => {
+          if (typeof childNamespace === 'string') {
+            return new MockLogService(`${rootNamespace}:${childNamespace}`, debugLevel);
+          } else {
+            // Currently, the only symbol identifies the root logger. [wh]
+            return new MockLogService(rootNamespace);
+          }
+        },
+      });
+    }
 
     return {
       module: MockNestjsLoggerModule,
