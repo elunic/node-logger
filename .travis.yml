@@ -23,6 +23,7 @@ jobs:
         - cp -r dist/src/* .
       deploy:
         provider: npm
+        edge: true
         email: "$NPM_EMAIL"
         api_key: "$NPM_AUTH_TOKEN"
         skip_cleanup: true
