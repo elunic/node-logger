@@ -1,4 +1,4 @@
-import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
+import { DynamicModule, Module, Provider } from '@nestjs/common';
 
 import { LogService } from '../service';
 import { RootLogger } from '../types';
@@ -7,16 +7,44 @@ import { loggerNamespaces } from './inject-logger.decorator';
 
 export const LOGGER = Symbol('LOGGER');
 
-@Global()
+export interface LoggerModuleOptions {
+  isGlobal: boolean;
+}
+
 @Module({})
 export class LoggerModule {
-  static forRoot(logger: RootLogger): DynamicModule {
+  static forRoot(logger: RootLogger, options: Partial<LoggerModuleOptions> = {}): DynamicModule {
+    options = Object.assign(
+      {
+        isGlobal: true,
+      },
+      options || {},
+    );
+
     const providers: Provider[] = [
       {
         provide: LOGGER,
         useFactory: () => new LogService(logger),
       },
+      ...this.createLoggerProviders(logger),
     ];
+
+    return {
+      module: LoggerModule,
+      global: !!options.isGlobal,
+      providers,
+      exports: providers,
+    };
+  }
+
+  static forFeature(): DynamicModule {
+    return {
+      module: LoggerModule,
+    };
+  }
+
+  private static createLoggerProviders(logger: RootLogger): Provider[] {
+    const providers: Provider[] = [];
 
     for (const [logNamespace, [injectionToken, rawChildOptions]] of Array.from(loggerNamespaces)) {
       providers.push({
@@ -32,10 +60,6 @@ export class LoggerModule {
       });
     }
 
-    return {
-      module: LoggerModule,
-      providers,
-      exports: providers,
-    };
+    return providers;
   }
 }
