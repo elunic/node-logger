@@ -10,6 +10,7 @@ install:
   - npm install
 script:
   - npm run test:ci
+  - npm run integration-test:ci
 
 jobs:
   include:

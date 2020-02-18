@@ -1,8 +1,9 @@
+import * as Joi from '@hapi/joi';
 import * as path from 'path';
 import * as winston from 'winston';
+import * as WinstonCloudwatch from 'winston-cloudwatch';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
 
-import { defaultFormat } from './defaultFormat';
 import { levels } from './levels';
 import {
   CreateChildLoggerOptions,
@@ -10,34 +11,34 @@ import {
   Logger,
   LogLevels,
   RootLogger,
+  ROOT_LOGGER_OPTIONS_SCHEMA,
 } from './types';
+import { cloudwatchMessageFormatterFactory } from './utils/cloudwatch-message-formatter';
+import { defaultFormat } from './utils/defaultFormat';
+import { printf } from './utils/printf';
 import { validateNamespace } from './validateNamespace';
 
 export { CreateRootLoggerOptions, LogLevels };
 export { defaultFormat };
+export { printf };
 export { LogService } from './service';
 export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
 
 export { RootLogger, Logger };
-export {
-  CustomRootWinstonLogger,
-  CustomWinstonLogger,
-  CreateLoggerOptions,
-  CreateChildLoggerOptions,
-} from './types';
+export { CreateChildLoggerOptions } from './types';
 
-function createLogger(rootNamespace: string, rawOptions?: CreateRootLoggerOptions): RootLogger {
+type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
+
+function createLogger(
+  rootNamespace: string,
+  rawOptions?: DeepPartial<CreateRootLoggerOptions>,
+): RootLogger {
   validateNamespace(rootNamespace);
 
-  const options = Object.assign(
-    {},
-    {
-      consoleLevel: LogLevels.Info,
-      logPath: undefined,
-      loggerOptions: undefined,
-    },
+  const options: CreateRootLoggerOptions = Joi.attempt(
     rawOptions || {},
+    ROOT_LOGGER_OPTIONS_SCHEMA,
   );
 
   const rootLogger = _createWinstonLogger(
@@ -45,19 +46,41 @@ function createLogger(rootNamespace: string, rawOptions?: CreateRootLoggerOption
     options.logPath,
     options.loggerOptions,
   ) as RootLogger;
+
   rootLogger.add(
     new winston.transports.Console({
       level: options.consoleLevel || 'info',
-      format: winston.format.combine(
-        winston.format.colorize({
-          colors: levels.colors,
-        }),
-        defaultFormat,
-        // winston.format.timestamp(),
-        // winston.format.printf(printf),
-      ),
+      format: options.json
+        ? winston.format.combine(winston.format.timestamp(), winston.format.json())
+        : winston.format.combine(
+            winston.format.colorize({
+              colors: levels.colors,
+            }),
+            winston.format.timestamp(),
+            winston.format.printf(printf),
+          ),
     }),
   );
+
+  if (options.cloudWatch.enabled) {
+    rootLogger.add(
+      // @ts-ignore: winston-cloudwatch's type definition is incorrect (should be TransformableInfo)
+      new WinstonCloudwatch({
+        jsonMessage: options.json,
+        messageFormatter: options.json
+          ? undefined
+          : cloudwatchMessageFormatterFactory(
+              winston.format.combine(winston.format.timestamp(), winston.format.printf(printf)),
+            ),
+        awsSecretKey: options.cloudWatch.awsSecretKey,
+        awsAccessKeyId: options.cloudWatch.awsAccessKeyId,
+        awsRegion: options.cloudWatch.awsRegion,
+        level: options.cloudWatch.level,
+        logGroupName: options.cloudWatch.logGroupName,
+        logStreamName: options.cloudWatch.logStreamName,
+      }),
+    );
+  }
 
   function _createWinstonLogger(
     namespace: string,

@@ -1,6 +1,6 @@
 {
   "name": "@elunic/logger",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "A simple wrapper around winston which logs to console as well as multiple files, with child namespaces.",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -8,9 +8,13 @@
   "license": "MIT",
   "scripts": {
     "test": "npm run test:watch",
-    "test:watch": "npm run clean && npx tsc-watch --onSuccess \"npx jasmine --config=.jasmine.json\" --preserveWatchOutput -w --noEmitOnError false",
-    "test:once": "npm run clean && npm run compile && npx jasmine --config=.jasmine.json && npm run check",
+    "test:watch": "npm run clean && tsc-watch --onSuccess \"jasmine --config=.jasmine.json\" --preserveWatchOutput -w --noEmitOnError false",
+    "test:once": "npm run clean && npm run compile && jasmine --config=.jasmine.json && npm run check",
     "test:ci": "npm run test:once",
+    "integration-test": "npm run integration-test:watch",
+    "integration-test:watch": "npm run clean && tsc-watch --onSuccess \"jasmine --config=.jasmine.integration.json\" --preserveWatchOutput -w --noEmitOnError false",
+    "integration-test:once": "npm run clean && npm run compile && jasmine --config=.jasmine.integration.json",
+    "integration-test:ci": "npm run integration-test:once",
     "compile": "tsc -p .",
     "compile:prod": "tsc -p tsconfig.prod.json",
     "clean": "rm -rf dist/",
@@ -34,35 +38,36 @@
     "email": "wh@elunic.com"
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.3.2",
-    "@commitlint/config-conventional": "^7.5.0",
-    "@elunic/ecs": "^0.1.4",
-    "@nestjs/common": "^6.11.5",
-    "@nestjs/core": "^6.11.5",
-    "@nestjs/platform-express": "^6.11.5",
-    "@nestjs/testing": "^6.11.5",
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "@elunic/ecs": "^0.2.3",
+    "@types/hapi__joi": "^16.0.10",
     "@types/jasmine": "^3.3.7",
+    "@types/jasmine-expect": "^3.8.1",
     "@types/node": "^10.12.19",
+    "@types/prettier": "^1.19.0",
     "@types/sinon": "^7.0.5",
+    "@types/source-map-support": "^0.5.1",
+    "@types/std-mocks": "^1.0.0",
     "@types/triple-beam": "^1.3.0",
     "husky": "^1.3.1",
     "jasmine": "^3.3.1",
+    "jasmine-expect": "^4.0.3",
     "jasmine-spec-reporter": "^4.2.1",
     "lint-staged": "^8.1.0",
-    "prettier": "^1.18.2",
-    "reflect-metadata": "^0.1.13",
-    "sinon": "^7.2.3",
+    "prettier": "^1.19.1",
+    "sinon": "^7.5.0",
     "source-map-support": "^0.5.12",
+    "std-mocks": "^1.0.1",
     "tsc-watch": "^1.1.34",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.0"
+    "tslint": "^6.0.0",
+    "typescript": "~3.7.0"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.0",
     "winston": "^3.2.1",
+    "winston-cloudwatch": "^2.3.0",
     "winston-daily-rotate-file": "^3.6.0"
-  },
-  "peerDependencies": {
-    "@nestjs/common": "^5.0.0 || ^6.5.2"
   },
   "publishConfig": {
     "access": "public"
