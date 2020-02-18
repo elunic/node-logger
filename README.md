@@ -2,31 +2,48 @@
 
 [![Build Status](https://travis-ci.org/elunic/node-logger.svg?branch=master)](https://travis-ci.org/elunic/node-logger)
 
+Written in TypeScript!
+
 **Important breaking change in v3.0.0**: logger instances are no
 longer unique, calling `createLogger()` with the same namespace twice
 returns two different instances, and `getLogger()` has been removed
 (`MockLogService.getLogger()` is still there).
 
-A simple wrapper around `winston` which logs to console as well as multiple files (with INFO, DEBUG and ERROR levels), with child namespaces (single level).
+**Important breaking change in v4.0.0**: The NestJS LoggerModule is not
+included by default anymore, mainly to provide a more modular approach
+concerning versioning where breaking changes are concerned.
 
-All loggers are `winston.Logger` instances, meaning you can add custom transports on top of the default convenience ones.
+A simple wrapper around `winston` which logs to console as well as multiple files
+(with INFO, DEBUG and ERROR levels), with child namespaces (single level).
 
-Provides the `bunyan` error levels.
+All loggers are `winston.Logger` instances, meaning you can add custom transports
+on top of the default convenience ones.
 
-Written in TypeScript.
+Provides the `bunyan` error levels:
+* `trace`
+* `debug`
+* `info`
+* `warn`
+* `error`
+* `fatal`
 
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-  * [Child namespaces](#child-namespaces)
-  * [Important notes](#important-notes)
-  * [`awilix` service function factory](#awilix-service-function-factory)
-  * [`bottlejs` service function factory](#bottlejs-service-function-factory)
-  * [`nestjs` service function factory](#nestjs-service-function-factory)
-- [Mock usage](#mock-usage)
-- [License](#license)
+- [`@elunic/logger`](#eluniclogger)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Functionality](#functionality)
+  - [Usage](#usage)
+    - [JSON logging](#json-logging)
+    - [Important notes on duplicate logger instances](#important-notes-on-duplicate-logger-instances)
+    - [Child namespaces](#child-namespaces)
+    - [`awilix` service function factory](#awilix-service-function-factory)
+    - [`bottlejs` service function factory](#bottlejs-service-function-factory)
+    - [AWS CloudWatch](#aws-cloudwatch)
+  - [Mock usage](#mock-usage)
+    - [`bottlejs`/`awilix` example](#bottlejsawilix-example)
+  - [License](#license)
 
 
 ## Installation
@@ -38,7 +55,7 @@ $ npm install @elunic/logger
 
 ## Functionality
 
-`createLogger()` (root as well as child) returns a `winston` logger with a default `Console` transport attached to it that 
+`createLogger()` (root as well as child) returns a `winston` logger with a default `Console` transport attached to it that
 logs the colorized log level to the console.
 
 If the root logger is passed the `logPath` option during creation, three files will be created per namespace: one for each of the
@@ -90,6 +107,37 @@ logger.add(new winston.transport.Console());
 ```
 
 
+### JSON logging
+
+For `NODE_ENV !== 'development'`, the logger will output uncolorized JSON by default.
+
+This behaviour can be overridden by setting the `json` option. The setting for this option will take
+precedence over the one determined from the environment.
+
+```javascript
+const createLogger = require('@elunic/logger');
+
+const logger = createLogger('app', {
+  consoleLevel: process.env.LOG_LEVEL || 'info',
+  json: true, // OR: NODE_ENV === 'development' by default
+});
+
+logger.warn('something seems funny');
+// {"timestamp": "2019-01-31T10:40:31Z", "level": "warn", "namespace": "app", "message": "something seems funny"}
+```
+
+
+### Important notes on duplicate logger instances
+
+Each call to `createLogger()` creates a **separate logger instance**, even if you call
+it twice with the same namespace. Handling of duplicates turned out to
+be too prone to errors and edge cases. If you absolutely need singleton
+loggers, implement it for your use case.
+
+On the other hand, this means you can pass distinct options on both calls,
+if that is a use case (for whatever reason).
+
+
 ### Child namespaces
 
 ```javascript
@@ -104,16 +152,6 @@ const grandChildLogger = childLogger.createLogger('invalid');
 logger.add(new winston.transport.Console());
 ```
 
-
-### Important notes
-
-Each call to `createLogger()` creates a **separate logger instance**, even if you call
-it twice with the same namespace. Handling of duplicates turned out to
-be too prone to errors and edge cases. If you absolutely need singleton
-loggers, implement it for your use case.
-
-On the other hand, this means you can pass distinct options on both calls,
-if that is a use case (for whatever reason).
 
 
 ### `awilix` service function factory
@@ -150,96 +188,44 @@ bottle.factory('log', bottlejsLogService(logger));
 ```
 
 
-### `nestjs` service function factory
+### AWS CloudWatch
+
+Logging to CloudWatch can be configured with the corresponding options.
+
+Note that this is an _additional_ transport and that logging to console/file is not affected by this.
 
 ```typescript
-import { Module, Injectable, Inject } from '@nestjs/common';
-import { createLogger, LogService } from '@elunic/logger';
-import { LoggerModule, LOGGER } from '@elunic/logger/nestjs';
+import { createLogger } from '@elunic/logger';
 
-const logger = createLogger('app');
+const logger = createLogger('app', {
+  consoleLevel: process.env.LOG_LEVEL || 'info',
+  logPath: process.cwd() + '/logs',
+  cloudWatch: {
+    enabled: true,
+    awsSecretKey: 'AWS_SECRET_KEY';
+    awsAccessKeyId: 'AWS_ACCESS_KEY_ID';
+    awsRegion: 'eu-central';
+    level: 'info';
 
-@Module({
-  imports: [
-    LoggerModule.forRoot(logger),
-  ],
-  providers: [HelperService],
-})
-export class AppModule {}
+    logGroupName: 'app';
+    // or: dynamic group name
+    logGroupName: () => cluster.isWorker? 'app-worker' : 'app-master',
 
-@Injectable()
-class HelperService {
-  constructor(@Inject(LOGGER) private log: LogService) {
+    logStreamName: 'stream-name';
+    // or: dynamic stream name
+    logStreamName: () => cluster.isWorker ? 'app-worker-stream1' : 'app-master-stream1',
   }
-
-  logFoo() {
-    this.log.info('foo');
-  }
-  
-  logChild() {
-    this.log.createLogger('childLogger').info('child foo');
-  }
-}
-```
-
-#### The `@InjectLogger()` Decorator
-
-As an alternative, a child logger can be injected directly, without
-having to inject the root log service to create a logger in  a second
-step.
-
-The `@InjectLogger()` decorator takes a **namespace string as argument**.
-
-If no argument is passed, the root LogService is returned.
-
-```typescript
-import { Module, Injectable, Inject } from '@nestjs/common';
-import { createLogger, LogService } from '@elunic/logger';
-import { LoggerModule, InjectLogger } from '@elunic/logger/nestjs';
-
-const logger = createLogger('app');
-
-@Module({
-  imports: [
-    LoggerModule.forRoot(logger),
-  ],
-  providers: [HelperService],
-})
-export class AppModule {}
-
-@Injectable()
-class HelperService {
-  constructor(
-    @InjectLogger('helper') private log: LogService,
-    @InjectLogger() private rootLog: LogService,
-    ) {
-  }
-
-  logFoo() {
-    // This will output "INFO [app:helper] foo"
-    this.log.info('foo');
-  }
-
-  logRootFoo() {
-    // This will output "INFO [app] foo"
-    this.rootLog.info('foo');
-  }
-  
-  logChild() {
-    // This will NOT work here, our logger is already a child logger.
-    // this.log.createLogger('childLogger').info('child foo');
-  }
-}
+});
 ```
 
 
 ## Mock usage
 
-Mocks for the service are included, both for `awilix` 
+Mocks for the service are included, both for `awilix`
 and `bottlejs` as well as `nestjs` registration. These are to help you when writing
 tests so they do not crash. They are silent be default (see below).
 
-Note that the arguments are slightly different than for the 
+Note that the arguments are slightly different than for the
 real service. No `logPath` is required, only `namespace` and `debugLevel`.
 
 `debugLevel` is set to silent by default to prevent flooding of your test
@@ -260,56 +246,22 @@ import { mockBottlejsLogService, MockLogService } from '@elunic/logger/mocks';
 describe('my application test', () => {
   let testBottle: Bottle;
   let logService: MockLogService;
-  
+
   beforeEach(async () => {
     testBottle = new Bottle();
-    
+
     // Mock log service
     testBottle.factory('log', mockBottlejsLogService('apptest', 'silent'));
-    
-    logService = testBottle.container.log;    
+
+    logService = testBottle.container.log;
   });
-  
+
   it('should call logs', async () => {
     // ... do some actual testing here
-    
+
     // logService.error is a sinon spy
     expect(logService.error.callCount).toEqual(1);
-    
-    // We can to know about some child logger
-    const childLoggerSpy = logService.getLogger('apptest:component');
-    expect(childLoggerSpy.error.callCount).toEqual(1);
-  });
-});
-```
 
-### `nestjs` example
-
-Image that `CatsService` depends on our `LogService`:
-
-```typescript
-import { MockNestjsLoggerModule, MockLogService } from '@elunic/logger/mocks';
-import { CatsService } from './cats.service';
-
-describe('NestJS module', () => {
-  let catsService: CatsService;
-  let logService: MockLogService;
-  
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
-        imports: [MockNestjsLoggerModule],
-        providers: [CatsService],
-      }).compile();
-
-    catsService = module.get<CatsService>(CatsService);
-  });
-  
-  it('should call logs', async () => {
-    // ... do some actual testing here
-    
-    // logService.error is a sinon spy
-    expect(logService.error.callCount).toEqual(1);
-    
     // We can to know about some child logger
     const childLoggerSpy = logService.getLogger('apptest:component');
     expect(childLoggerSpy.error.callCount).toEqual(1);
@@ -322,7 +274,7 @@ describe('NestJS module', () => {
 
 MIT License
 
-Copyright (c) 2019 elunic AG/William Hefter <wh@elunic.com>
+Copyright (c) 2019-2020 elunic AG/William Hefter <wh@elunic.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

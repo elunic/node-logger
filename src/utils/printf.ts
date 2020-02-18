@@ -2,7 +2,7 @@ import * as logform from 'logform';
 import { SPLAT } from 'triple-beam';
 import * as util from 'util';
 
-import { levelLabel } from './levelLabels';
+import { levelLabel } from '../levelLabels';
 
 export function printf(info: logform.TransformableInfo) {
   // We can't actually use info.meta because it is not reliably an array.
