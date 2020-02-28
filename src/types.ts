@@ -1,4 +1,4 @@
-import Joi = require('@hapi/joi');
+import * as Joi from '@hapi/joi';
 import * as winston from 'winston';
 
 export enum LogLevels {
