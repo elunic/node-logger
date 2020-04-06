@@ -1,6 +1,6 @@
 {
   "name": "@elunic/logger",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "A simple wrapper around winston which logs to console as well as multiple files, with child namespaces.",
   "main": "index.js",
   "typings": "index.d.ts",
