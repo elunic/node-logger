@@ -167,6 +167,11 @@ function createLogger(
     const namespace = `${rootNamespace}:${childNamespace}`;
 
     const childLogger = _createWinstonLogger(namespace, undefined, childOptions.loggerOptions);
+
+    // Workaround for the MaxListenersExceededWarning. Seems the number of listeners is at exactly 10
+    // before this call. It seems that increasing by exactly 1 helps (since we're adding one listener..)
+    rootLogger.setMaxListeners(rootLogger.getMaxListeners() + 1);
+
     childLogger.pipe(rootLogger);
 
     return childLogger;
