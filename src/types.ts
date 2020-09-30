@@ -8,6 +8,7 @@ export enum LogLevels {
   Warn = 'warn',
   Error = 'error',
   Fatal = 'fatal',
+  Silent = 'silent',
 }
 
 export interface Logger extends winston.Logger {
@@ -46,14 +47,7 @@ export interface CreateRootLoggerOptions {
 export const ROOT_LOGGER_OPTIONS_SCHEMA = Joi.object()
   .keys({
     consoleLevel: Joi.string()
-      .valid(
-        LogLevels.Trace,
-        LogLevels.Debug,
-        LogLevels.Info,
-        LogLevels.Warn,
-        LogLevels.Error,
-        LogLevels.Fatal,
-      )
+      .valid(...Object.values(LogLevels))
       .optional()
       .default(LogLevels.Info),
     logPath: Joi.string().optional(),
@@ -90,14 +84,7 @@ export const ROOT_LOGGER_OPTIONS_SCHEMA = Joi.object()
         level: Joi.when('enabled', {
           is: true,
           then: Joi.string()
-            .valid(
-              LogLevels.Trace,
-              LogLevels.Debug,
-              LogLevels.Info,
-              LogLevels.Warn,
-              LogLevels.Error,
-              LogLevels.Fatal,
-            )
+            .valid(...Object.values(LogLevels))
             .optional()
             .default(LogLevels.Info),
           otherwise: Joi.any().optional(),

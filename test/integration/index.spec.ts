@@ -1,7 +1,7 @@
 import 'jasmine-expect';
 import * as stdMocks from 'std-mocks';
 
-import { createLogger } from '../../src/';
+import { createLogger, LogLevels } from '../../src/';
 
 describe('logger', () => {
   let previousNodeEnv: string | undefined;
@@ -20,6 +20,30 @@ describe('logger', () => {
 
   afterEach(async () => {
     process.env.NODE_ENV = previousNodeEnv;
+  });
+
+  describe('silent mode', () => {
+    it('should not output anything for consoleLevel = LogLevel.Silent', async () => {
+      const logger = createLogger('test', { consoleLevel: LogLevels.Silent });
+
+      useStdMock();
+      logger.info('test');
+      const actual = stopStdMock();
+
+      expect(actual.stdout[0]).toBeUndefined();
+    });
+
+    for (const logLevel of Object.values(LogLevels).filter(x => x !== LogLevels.Silent)) {
+      it('should not be active for other consoleLevel = ' + logLevel, async () => {
+        const logger = createLogger('test', { consoleLevel: logLevel });
+
+        useStdMock();
+        logger.fatal('test');
+        const actual = stopStdMock();
+
+        expect(actual.stdout[0]).not.toBeUndefined();
+      });
+    }
   });
 
   describe('for NODE_ENV=development', () => {

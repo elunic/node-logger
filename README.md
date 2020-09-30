@@ -36,6 +36,7 @@ Provides the `bunyan` error levels:
   - [Functionality](#functionality)
   - [Usage](#usage)
     - [JSON logging](#json-logging)
+    - [Silent mode](#silent-mode)
     - [Important notes on duplicate logger instances](#important-notes-on-duplicate-logger-instances)
     - [Child namespaces](#child-namespaces)
     - [`awilix` service function factory](#awilix-service-function-factory)
@@ -125,6 +126,16 @@ const logger = createLogger('app', {
 logger.warn('something seems funny');
 // {"timestamp": "2019-01-31T10:40:31Z", "level": "warn", "namespace": "app", "message": "something seems funny"}
 ```
+
+
+### Silent mode
+
+If `consoleLevel` is set to `silent` (`LogLevels.Silent`), nothing will be output
+for any level. This can be useful for testing environments, where information
+about errors should mostly come from the test cases and expects themselves, and
+where you don't want unnecessary output in your console.
+
+This does **not** affect log *files*.
 
 
 ### Important notes on duplicate logger instances

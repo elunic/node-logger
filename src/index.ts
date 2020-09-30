@@ -49,6 +49,7 @@ function createLogger(
 
   rootLogger.add(
     new winston.transports.Console({
+      silent: options.consoleLevel === LogLevels.Silent,
       level: options.consoleLevel || 'info',
       format: options.json
         ? winston.format.combine(winston.format.timestamp(), winston.format.json())
