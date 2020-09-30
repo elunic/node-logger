@@ -41,6 +41,7 @@ Provides the `bunyan` error levels:
     - [Child namespaces](#child-namespaces)
     - [`awilix` service function factory](#awilix-service-function-factory)
     - [`bottlejs` service function factory](#bottlejs-service-function-factory)
+    - [`nestjs` integration](#nestjs-integration)
     - [AWS CloudWatch](#aws-cloudwatch)
   - [Mock usage](#mock-usage)
     - [`bottlejs`/`awilix` example](#bottlejsawilix-example)
@@ -197,6 +198,12 @@ const logger = createLogger('app', {
 
 bottle.factory('log', bottlejsLogService(logger));
 ```
+
+
+### `nestjs` integration
+
+Integration for NestJS is provided through the separate module
+[@elunic/logger-nestjs](https://www.npmjs.com/package/@elunic/logger-nestjs).
 
 
 ### AWS CloudWatch
