@@ -41,7 +41,6 @@
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@elunic/ecs": "^0.3.3",
-    "@types/hapi__joi": "^16.0.10",
     "@types/jasmine": "^3.3.7",
     "@types/jasmine-expect": "^3.8.1",
     "@types/node": "^10.12.19",
@@ -64,7 +63,7 @@
     "typescript": "~3.7.0"
   },
   "dependencies": {
-    "@hapi/joi": "^17.1.0",
+    "joi": "^17.3.0",
     "winston": "^3.2.1",
     "winston-cloudwatch": "^2.3.0",
     "winston-daily-rotate-file": "^3.6.0"

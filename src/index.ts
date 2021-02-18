@@ -1,4 +1,4 @@
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 import * as path from 'path';
 import * as winston from 'winston';
 import * as WinstonCloudwatch from 'winston-cloudwatch';
