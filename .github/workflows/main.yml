@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches:
+        - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: test
+    strategy:
+      matrix:
+        node: [10, 12, 14]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ matrix.node }}"
+      - name: npm install
+        run: npm install
+      - name: run unit tests
+        run: npm run test:ci
+      - name: run integration tests
+        run: npm run integration-test:ci
