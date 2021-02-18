@@ -37,23 +37,27 @@ export class MockLogger {
 
     this.fakes = {
       trace: sinon.fake((...args: unknown[]) =>
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
         numDebugLevel <= 10 ? console.debug(`TRACE [${namespace}]`, ...args) : undefined,
       ),
       debug: sinon.fake((...args: unknown[]) =>
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
         numDebugLevel <= 20 ? console.debug(`DEBUG [${namespace}]`, ...args) : undefined,
       ),
       info: sinon.fake((...args: unknown[]) =>
+        // eslint-disable-next-line no-console
         numDebugLevel <= 30 ? console.log(` INFO [${namespace}]`, ...args) : undefined,
       ),
       warn: sinon.fake((...args: unknown[]) =>
+        // eslint-disable-next-line no-console
         numDebugLevel <= 40 ? console.warn(` WARN [${namespace}]`, ...args) : undefined,
       ),
       error: sinon.fake((...args: unknown[]) =>
+        // eslint-disable-next-line no-console
         numDebugLevel <= 50 ? console.error(`ERROR [${namespace}]`, ...args) : undefined,
       ),
       fatal: sinon.fake((...args: unknown[]) =>
+        // eslint-disable-next-line no-console
         numDebugLevel <= 60 ? console.error(`FATAL [${namespace}]`, ...args) : undefined,
       ),
     };

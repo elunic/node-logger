@@ -1,4 +1,4 @@
-const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+import { SpecReporter, StacktraceOption } from 'jasmine-spec-reporter';
 
 jasmine.getEnv().clearReporters();
 jasmine.getEnv().addReporter(
@@ -9,7 +9,7 @@ jasmine.getEnv().addReporter(
     },
     summary: {
       displayDuration: true,
-      displayStacktrace: true,
+      displayStacktrace: StacktraceOption.PRETTY,
     },
   }),
 );

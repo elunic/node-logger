@@ -1,6 +1,0 @@
-{
-  "extends": "@elunic/ecs/tslint/tslint.json",
-  "rules": {
-    "no-default-export": false
-  }
-}

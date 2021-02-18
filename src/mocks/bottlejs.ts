@@ -1,5 +1,4 @@
 import { LogLevels } from '../types';
-
 import { MockLogService } from './service';
 
 export function mockBottlejsLogService(

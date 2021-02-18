@@ -1,7 +1,5 @@
 {
   "{src,test}/**/*.{ts,js}": [
-    "tslint --fix -p . -c tslint.fix.json",
-    "prettier --write",
-    "git add"
+    "eslint -c .eslintrc.fix.json --fix"
   ]
 }

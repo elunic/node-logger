@@ -1,5 +1,4 @@
 import { LogLevels } from '../types';
-
 import { MockLogger, MockRootLogger } from './logger';
 
 export class MockLogService {
@@ -45,7 +44,7 @@ export class MockLogService {
   }
 
   getLogger(fullNamespace: string): MockLogger | MockRootLogger | undefined {
-    if (this.loggers.hasOwnProperty(fullNamespace)) {
+    if (Object.prototype.hasOwnProperty.call(this.loggers, fullNamespace)) {
       return this.loggers[fullNamespace];
     }
 

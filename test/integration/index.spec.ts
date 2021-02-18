@@ -1,4 +1,5 @@
 import 'jasmine-expect';
+
 import * as stdMocks from 'std-mocks';
 
 import { createLogger, LogLevels } from '../../src/';

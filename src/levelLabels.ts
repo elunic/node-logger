@@ -3,7 +3,7 @@ import { levelLabels } from './levels';
 // This enables colored aligned uppercase level labels.
 const levelLabelCache: { [key: string]: string } = {};
 export function levelLabel(level: string) {
-  if (levelLabelCache.hasOwnProperty(level)) {
+  if (Object.prototype.hasOwnProperty.call(levelLabelCache, level)) {
     return levelLabelCache[level];
   }
 

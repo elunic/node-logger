@@ -51,9 +51,7 @@ export const ROOT_LOGGER_OPTIONS_SCHEMA = Joi.object()
       .optional()
       .default(LogLevels.Info),
     logPath: Joi.string().optional(),
-    loggerOptions: Joi.object()
-      .optional()
-      .default({}),
+    loggerOptions: Joi.object().optional().default({}),
     json: Joi.boolean()
       .optional()
       // Callback for runtime-determining each time the function is used
@@ -63,9 +61,7 @@ export const ROOT_LOGGER_OPTIONS_SCHEMA = Joi.object()
       .optional()
       .default({ enabled: false })
       .keys({
-        enabled: Joi.boolean()
-          .optional()
-          .default(false),
+        enabled: Joi.boolean().optional().default(false),
         awsSecretKey: Joi.when('enabled', {
           is: true,
           then: Joi.string().required(),

@@ -1,4 +1,4 @@
-export { mockBottlejsLogService } from './bottlejs';
 export { mockAwilixLogService } from './awilix';
-export { MockLogService } from './service';
+export { mockBottlejsLogService } from './bottlejs';
 export { MockLogger, MockRootLogger } from './logger';
+export { MockLogService } from './service';

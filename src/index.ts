@@ -10,8 +10,8 @@ import {
   CreateRootLoggerOptions,
   Logger,
   LogLevels,
-  RootLogger,
   ROOT_LOGGER_OPTIONS_SCHEMA,
+  RootLogger,
 } from './types';
 import { cloudwatchMessageFormatterFactory } from './utils/cloudwatch-message-formatter';
 import { defaultFormat } from './utils/defaultFormat';
@@ -21,14 +21,16 @@ import { validateNamespace } from './validateNamespace';
 export { CreateRootLoggerOptions, LogLevels };
 export { defaultFormat };
 export { printf };
-export { LogService } from './service';
 export { awilixLogService } from './awilix';
 export { bottlejsLogService } from './bottlejs';
+export { LogService } from './service';
 
-export { RootLogger, Logger };
+export { Logger, RootLogger };
 export { CreateChildLoggerOptions } from './types';
 
-type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
+type DeepPartial<T> = T extends typeof Object.prototype
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T;
 
 function createLogger(
   rootNamespace: string,
@@ -65,6 +67,7 @@ function createLogger(
 
   if (options.cloudWatch.enabled) {
     rootLogger.add(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore: winston-cloudwatch's type definition is incorrect (should be TransformableInfo)
       new WinstonCloudwatch({
         jsonMessage: options.json,
@@ -182,5 +185,6 @@ function createLogger(
   return rootLogger;
 }
 
+// eslint-disable-next-line import/no-default-export
 export default createLogger;
 export { createLogger };
