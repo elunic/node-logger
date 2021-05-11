@@ -1,6 +1,6 @@
 {
   "name": "@elunic/logger",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "description": "A simple wrapper around winston which logs to console as well as multiple files, with child namespaces.",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -67,7 +67,7 @@
   "dependencies": {
     "joi": "^17.3.0",
     "winston": "^3.2.1",
-    "winston-cloudwatch": "^2.3.0",
+    "winston-cloudwatch": "^2.5.2",
     "winston-daily-rotate-file": "^3.6.0"
   },
   "publishConfig": {
