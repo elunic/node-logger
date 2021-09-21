@@ -20,13 +20,13 @@ All loggers are `winston.Logger` instances, meaning you can add custom transport
 on top of the default convenience ones.
 
 Provides the `bunyan` error levels:
-* `trace`
-* `debug`
-* `info`
-* `warn`
-* `error`
-* `fatal`
 
+- `trace`
+- `debug`
+- `info`
+- `warn`
+- `error`
+- `fatal`
 
 ## Table of Contents
 
@@ -46,13 +46,11 @@ Provides the `bunyan` error levels:
     - [`bottlejs`/`awilix` example](#bottlejsawilix-example)
   - [License](#license)
 
-
 ## Installation
 
 ```bash
 $ npm install @elunic/logger
 ```
-
 
 ## Functionality
 
@@ -64,9 +62,8 @@ INFO, DEBUG and ERROR levels (DEBUG will contain all messages at or above the DE
 
 Subfolders are created for the child loggers' files.
 
-Log messages from the child loggers *also* get logged through the root logger, which means that the console output *and* the
-root logger's log files contain *all* messages, but you can drill down to child logs quickly.
-
+Log messages from the child loggers _also_ get logged through the root logger, which means that the console output _and_ the
+root logger's log files contain _all_ messages, but you can drill down to child logs quickly.
 
 ## Usage
 
@@ -107,7 +104,6 @@ logger.trace('highly detailed information');
 logger.add(new winston.transport.Console());
 ```
 
-
 ### JSON logging
 
 For `NODE_ENV !== 'development'`, the logger will output uncolorized JSON by default.
@@ -127,7 +123,6 @@ logger.warn('something seems funny');
 // {"timestamp": "2019-01-31T10:40:31Z", "level": "warn", "namespace": "app", "message": "something seems funny"}
 ```
 
-
 ### Silent mode
 
 If `consoleLevel` is set to `silent` (`LogLevels.Silent`), nothing will be output
@@ -135,8 +130,7 @@ for any level. This can be useful for testing environments, where information
 about errors should mostly come from the test cases and expects themselves, and
 where you don't want unnecessary output in your console.
 
-This does **not** affect log *files*.
-
+This does **not** affect log _files_.
 
 ### Important notes on duplicate logger instances
 
@@ -147,7 +141,6 @@ loggers, implement it for your use case.
 
 On the other hand, this means you can pass distinct options on both calls,
 if that is a use case (for whatever reason).
-
 
 ### Child namespaces
 
@@ -163,13 +156,11 @@ const grandChildLogger = childLogger.createLogger('invalid');
 logger.add(new winston.transport.Console());
 ```
 
-
-
 ### `awilix` service function factory
 
 ```javascript
 const awilix = require('awilix');
-const {createLogger, awilixLogService} = require('@elunic/logger');
+const { createLogger, awilixLogService } = require('@elunic/logger');
 
 const container = awilix.createContainer();
 const logger = createLogger('app', {
@@ -179,15 +170,14 @@ const logger = createLogger('app', {
 
 container.register({
   log: awilix.asFunction(awilixLogService(logger)),
-})
+});
 ```
-
 
 ### `bottlejs` service function factory
 
 ```javascript
 const Bottle = require('bottlejs');
-const {createLogger, bottlejsLogService} = require('@elunic/logger');
+const { createLogger, bottlejsLogService } = require('@elunic/logger');
 
 const bottle = new Bottle();
 const logger = createLogger('app', {
@@ -198,12 +188,10 @@ const logger = createLogger('app', {
 bottle.factory('log', bottlejsLogService(logger));
 ```
 
-
 ### `nestjs` integration
 
 Integration for NestJS is provided through the separate module
 [@elunic/logger-nestjs](https://www.npmjs.com/package/@elunic/logger-nestjs).
-
 
 ## Mock usage
 
@@ -254,7 +242,6 @@ describe('my application test', () => {
   });
 });
 ```
-
 
 ## License
 
