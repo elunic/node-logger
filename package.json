@@ -67,7 +67,6 @@
   "dependencies": {
     "joi": "^17.3.0",
     "winston": "^3.2.1",
-    "winston-cloudwatch": "^2.5.2",
     "winston-daily-rotate-file": "^3.6.0"
   },
   "publishConfig": {

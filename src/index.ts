@@ -1,7 +1,6 @@
 import * as Joi from 'joi';
 import * as path from 'path';
 import * as winston from 'winston';
-import * as WinstonCloudwatch from 'winston-cloudwatch';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
 
 import { levels } from './levels';
@@ -13,7 +12,6 @@ import {
   ROOT_LOGGER_OPTIONS_SCHEMA,
   RootLogger,
 } from './types';
-import { cloudwatchMessageFormatterFactory } from './utils/cloudwatch-message-formatter';
 import { defaultFormat } from './utils/defaultFormat';
 import { printf } from './utils/printf';
 import { validateNamespace } from './validateNamespace';
@@ -64,27 +62,6 @@ function createLogger(
           ),
     }),
   );
-
-  if (options.cloudWatch.enabled) {
-    rootLogger.add(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: winston-cloudwatch's type definition is incorrect (should be TransformableInfo)
-      new WinstonCloudwatch({
-        jsonMessage: options.json,
-        messageFormatter: options.json
-          ? undefined
-          : cloudwatchMessageFormatterFactory(
-              winston.format.combine(winston.format.timestamp(), winston.format.printf(printf)),
-            ),
-        awsSecretKey: options.cloudWatch.awsSecretKey,
-        awsAccessKeyId: options.cloudWatch.awsAccessKeyId,
-        awsRegion: options.cloudWatch.awsRegion,
-        level: options.cloudWatch.level,
-        logGroupName: options.cloudWatch.logGroupName,
-        logStreamName: options.cloudWatch.logStreamName,
-      }),
-    );
-  }
 
   function _createWinstonLogger(
     namespace: string,

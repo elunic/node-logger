@@ -42,7 +42,6 @@ Provides the `bunyan` error levels:
     - [`awilix` service function factory](#awilix-service-function-factory)
     - [`bottlejs` service function factory](#bottlejs-service-function-factory)
     - [`nestjs` integration](#nestjs-integration)
-    - [AWS CloudWatch](#aws-cloudwatch)
   - [Mock usage](#mock-usage)
     - [`bottlejs`/`awilix` example](#bottlejsawilix-example)
   - [License](#license)
@@ -204,37 +203,6 @@ bottle.factory('log', bottlejsLogService(logger));
 
 Integration for NestJS is provided through the separate module
 [@elunic/logger-nestjs](https://www.npmjs.com/package/@elunic/logger-nestjs).
-
-
-### AWS CloudWatch
-
-Logging to CloudWatch can be configured with the corresponding options.
-
-Note that this is an _additional_ transport and that logging to console/file is not affected by this.
-
-```typescript
-import { createLogger } from '@elunic/logger';
-
-const logger = createLogger('app', {
-  consoleLevel: process.env.LOG_LEVEL || 'info',
-  logPath: process.cwd() + '/logs',
-  cloudWatch: {
-    enabled: true,
-    awsSecretKey: 'AWS_SECRET_KEY';
-    awsAccessKeyId: 'AWS_ACCESS_KEY_ID';
-    awsRegion: 'eu-central';
-    level: 'info';
-
-    logGroupName: 'app';
-    // or: dynamic group name
-    logGroupName: () => cluster.isWorker? 'app-worker' : 'app-master',
-
-    logStreamName: 'stream-name';
-    // or: dynamic stream name
-    logStreamName: () => cluster.isWorker ? 'app-worker-stream1' : 'app-master-stream1',
-  }
-});
-```
 
 
 ## Mock usage

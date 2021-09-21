@@ -31,17 +31,6 @@ export interface CreateRootLoggerOptions {
   logPath: string;
   loggerOptions: winston.LoggerOptions;
   json: boolean;
-  cloudWatch:
-    | { enabled: false }
-    | {
-        enabled: true;
-        awsSecretKey: string;
-        awsAccessKeyId: string;
-        awsRegion: string;
-        level: string;
-        logGroupName: string | (() => string);
-        logStreamName: string | (() => string);
-      };
 }
 
 export const ROOT_LOGGER_OPTIONS_SCHEMA = Joi.object()
