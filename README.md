@@ -13,6 +13,8 @@ returns two different instances, and `getLogger()` has been removed
 included by default anymore, mainly to provide a more modular approach
 concerning versioning where breaking changes are concerned.
 
+**Important breaking change in v5.0.0**: The CloudWatch integration has been removed; it was causing an unsolvable `npm audit` issue while only being used in a tiny minority of cases. Adding a CloudWatch transporter to Logger instances manually is still possible.
+
 A simple wrapper around `winston` which logs to console as well as multiple files
 (with INFO, DEBUG and ERROR levels), with child namespaces (single level).
 
