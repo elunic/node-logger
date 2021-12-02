@@ -71,20 +71,15 @@ describe('logger', () => {
       logger.info('test');
       const actual = stopStdMock();
 
-      try {
-        const parsed = JSON.parse(actual.stdout[0]);
-        expect(parsed).toEqual(
-          jasmine.objectContaining({
-            message: 'test',
-            level: 'info',
-            namespace: 'test',
-          }),
-        );
-        expect(parsed.timestamp).toBeIso8601();
-      } catch (err) {
-        err.message = `Error parsing output JSON: ${err.message}`;
-        throw err;
-      }
+      const parsed = JSON.parse(actual.stdout[0]);
+      expect(parsed).toEqual(
+        jasmine.objectContaining({
+          message: 'test',
+          level: 'info',
+          namespace: 'test',
+        }),
+      );
+      expect(parsed.timestamp).toBeIso8601();
     });
   });
 
@@ -100,20 +95,15 @@ describe('logger', () => {
       logger.info('test');
       const actual = stopStdMock();
 
-      try {
-        const parsed = JSON.parse(actual.stdout[0]);
-        expect(parsed).toEqual(
-          jasmine.objectContaining({
-            message: 'test',
-            level: 'info',
-            namespace: 'test:child',
-          }),
-        );
-        expect(parsed.timestamp).toBeIso8601();
-      } catch (err) {
-        err.message = `Error parsing output JSON: ${err.message}`;
-        throw err;
-      }
+      const parsed = JSON.parse(actual.stdout[0]);
+      expect(parsed).toEqual(
+        jasmine.objectContaining({
+          message: 'test',
+          level: 'info',
+          namespace: 'test:child',
+        }),
+      );
+      expect(parsed.timestamp).toBeIso8601();
     });
 
     it('should output an non-JSON INFO string when json: false', async () => {

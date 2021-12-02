@@ -11,6 +11,7 @@ export function printf(info: logform.TransformableInfo) {
   // meta array or just the value itself.
   // Hence, access the meta directly.
   // [wh]
+  // @ts-expect-error Update to triple-beam types makes SPLAT a unique symbol
   const meta = info[SPLAT];
 
   if (meta) {
